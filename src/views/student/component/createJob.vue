@@ -10,20 +10,20 @@
         label="id"
         prop="id" >
         <el-input
-          :disabled="flag==='edit'"
+          :disabled="noedit"
           v-model="ruleForm.id"/>
       </el-form-item>
        <el-form-item
         label="别名"
         prop="display" >
         <el-input
-          :disabled="flag==='edit'"
+          :disabled="noedit"
           v-model="ruleForm.display"/>
       </el-form-item>
        <el-form-item
         label="所有者"
         prop="" >
-          <el-select :disabled="flag==='edit'" v-model="ruleForm.owner" placeholder="任务所属物联网节点">
+          <el-select :disabled="noedit" v-model="ruleForm.owner" placeholder="任务所属物联网节点">
             <el-option :label="item.name" :value="item.name" v-for="(item,index) in allnode" :key="index"></el-option>
         </el-select>
       </el-form-item>
@@ -53,9 +53,17 @@
     </el-form-item>
       <el-form-item>
         <el-button
-          type="primary"
-          @click="submitForm('ruleForm')">
-          保存
+            v-if="!haddle"
+            type="primary"
+            @click="submitForm('ruleForm')">
+            保存
+        </el-button>
+        <el-button
+            v-else
+            @click="openFullScreen"
+            v-loading.fullscreen.lock="fullscreenLoading"
+            type="primary">
+            执行
         </el-button>
       </el-form-item>
     </el-form>
@@ -63,7 +71,7 @@
 </template>
 
 <script>
-import { toString, tojson } from "../../../util/filter.js";
+import { toString, tojson, formatDate } from "../../../util/filter.js";
 export default {
   components: {},
   data () {
@@ -85,21 +93,33 @@ export default {
         ]
       },
       flag:'add',
-      allnode:[]
+      allnode:[], // 获取到所有node
+      haddle:false, // 是否为执行任务
+      fullscreenLoading:false, // 控制加载中 是否显示
+      haddleresult:false, // 执行结果
+      starttime: '', // 开始执行时间
+      endtime:'',// 执行结束时间
     };
   },
 
 
-  computed: {},
+  computed: {
+    noedit(){
+        return this.flag || this.haddle
+    }
+  },
 
   mounted(){
+    this.haddle = false
+    this.flag = false
     this.getallnode()
     this.initdata = tojson(localStorage.getItem("jobdata"));
     const query = this.$route.query
     if(!query.status) return
-    const { status } = query
+    const { status , haddle} = query
     this.ruleForm = status
     this.flag = status || false;
+    this.haddle = haddle || false
 
   },
 
@@ -107,22 +127,53 @@ export default {
     getallnode(){
         const lot = tojson(localStorage.getItem("lotdata")) || []
         const fog = tojson(localStorage.getItem("fogdata")) || []
-        console.log(lot, fog)
         this.allnode  = lot.concat(fog) 
-        console.log(this.allnode )
+    },
+    // 执行任务 随机时间长度
+    getRandomNumber(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    },
+    openFullScreen() {
+        const time  = this.getRandomNumber(1000,10000)
+        this.fullscreenLoading = true;
+        this.starttime = new Date() // 记录开始执行时间
+        setTimeout(() => {
+          this.fullscreenLoading = false;
+            this.endtime = new Date() // 执行结束
+          if(time < 5000){
+            this.$message.success('成功')
+            this.haddleresult = true
+          } else {
+            this.$message.error('失败')
+            this.haddleresult = false
+          } 
+          //  处理当前数据
+          this.ruleForm.schedule = formatDate(this.starttime) 
+          if(this.haddleresult) this.ruleForm.lastsuccess = formatDate(this.endtime)
+          else this.ruleForm.lasterror = formatDate(this.endtime)
+          this.ruleForm.timeone = `${time}s`
+          this.ruleForm.status = this.haddleresult == true ? '成功' : '失败'
+          this.setdata()
+        }, time);
+        console.log(this.ruleForm,'ruleForm')
+      },
+    //   把内存数据找出来 编辑/执行
+    setdata(){
+        const data = this.initdata.map(item=>{
+            if(item.id === this.ruleForm.id) {
+                return this.ruleForm
+            }
+            return item
+        })
+        localStorage.setItem("jobdata", toString(data));
     },
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
+            this.ruleForm.status = '未开始'
             // 如果是编辑 flag为true
             if(this.flag){
-               const data = this.initdata.map(item=>{
-                    if(item.id === this.ruleForm.id) {
-                        return this.ruleForm
-                    }
-                    return item
-               })
-               localStorage.setItem("jobdata", toString(data));
+                this.setdata()
             }else {
                 this.initdata.push(this.ruleForm);
                 localStorage.setItem("jobdata", toString(this.initdata));
@@ -144,6 +195,14 @@ export default {
     width: 40%;
     padding: 16px;
     margin-left: 60px;
+}
+.el-select {
+    width: 100%;
+}
+.el-button {
+    width: 100%;
+    margin-top: 60px;
+
 }
 </style>
 

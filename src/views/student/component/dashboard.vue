@@ -34,9 +34,6 @@
           style="width: 100%"
           :default-sort="{prop: 'id', order: 'descending'}">
           <el-table-column
-            type="selection"
-            min-width="55"/>
-          <el-table-column
             v-for="(item ,index) in columns"
             :key="index"
             :prop="item.prop"

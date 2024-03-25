@@ -59,7 +59,6 @@ export const constantRoutes = [
   {
     path:'/',
     redirect:'/login'
-    // component: () => import('@/views/student/login'),
   },
 
 ];

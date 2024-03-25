@@ -109,7 +109,7 @@ export default {
       this.$router.push({
         path: "/home/create",
         query: {
-          status: row,
+          status: row
         },
       });
     },
@@ -123,7 +123,8 @@ export default {
       });
     },
     createJob() {
-      this.$router.push({ path: "/home/create" });
+      this.$router.push({ path: "/home/create" ,
+    });
     },
     clearvalue() {
       if (!this.statusvalue) return;
