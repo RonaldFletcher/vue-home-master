@@ -92,7 +92,7 @@ export default {
           { min: 1, max: 10, message: '长度在 1 到 100 个字符', trigger: 'blur' }
         ]
       },
-      flag:'add',
+      flag:'',
       allnode:[], // 获取到所有node
       haddle:false, // 是否为执行任务
       fullscreenLoading:false, // 控制加载中 是否显示
@@ -105,6 +105,7 @@ export default {
 
   computed: {
     noedit(){
+        console.log(this.flag, this.haddle,'-----')
         return this.flag || this.haddle
     }
   },
@@ -118,7 +119,7 @@ export default {
     if(!query.status) return
     const { status , haddle} = query
     this.ruleForm = status
-    this.flag = status || false;
+    this.flag = status ? true : false;
     this.haddle = haddle || false
 
   },
@@ -154,6 +155,7 @@ export default {
           this.ruleForm.timeone = `${time}s`
           this.ruleForm.status = this.haddleresult == true ? '成功' : '失败'
           this.setdata()
+          this.$router.push({ path: '/home/job' });
         }, time);
         console.log(this.ruleForm,'ruleForm')
       },
