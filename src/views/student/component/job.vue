@@ -31,7 +31,6 @@
     </div>
     <!-- 表格 -->
     <el-table
-      @cell-click="cellclick"
       ref="multipleTable"
       :data="tableData"
       tooltip-effect="dark"
@@ -62,14 +61,18 @@
           </el-popover>
         </template>
       </el-table-column>
-      <el-table-column label="" min-width="160" fixed="right">
+      <el-table-column label="" min-width="200" fixed="right">
         <template slot-scope="scope">
           <span @click="handleEdit(scope.$index, scope.row)" class="edit">
             <i class="el-icon-edit" />
             <span style="margin-left: 6px">编辑</span>
           </span>
+          <span @click="deleterow(scope.$index, scope.row)" class="edit" >
+            <i class="el-icon-delete" />
+            <span style="margin-left: 6px">删除</span>
+          </span>
           <span @click="tohaddle(scope.$index, scope.row)" class="edit">
-            <!-- <i class="el-icon-edit" /> -->
+            <i class="el-icon-setting"></i>
             <span style="margin-left: 6px">执行</span>
           </span>
         </template>
@@ -148,7 +151,15 @@ export default {
         return item.status === this.statusvalue;
       });
     },
-    cellclick(row, column, cell, event) {},
+    deleterow(index, row){
+        const data = this.tableData
+        this.tableData = data.filter((item, key)=>{
+            return key !== index
+        })
+        localStorage.setItem('jobdata', toString(this.tableData))
+        this.$message.success('成功')
+
+    },
   },
 };
 </script>
@@ -181,6 +192,7 @@ export default {
 .edit {
   cursor: pointer;
   color: #1976d2;
+  margin-right: 5px;
 }
 .page {
   position: absolute;
