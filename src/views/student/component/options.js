@@ -1,12 +1,10 @@
 export const columns = [
-  { prop:'id',label:'id' , width: '120' },//作业id。必须是唯一的
+  { prop:'id',label:'id' , width: '180' },//作业id。必须是唯一的
   { prop:'display',label:'别名' , width: '180' },//作业的显示名称。如果存在，则显示该名称，而不是默认名称。
-  { prop:'timeone',label:'时区' , width: '120' },//将评估 cron 表达式的时区。
-  { prop:'schedule',label:'开始执行时间' , width: '160' },//任务的 Cron 表达式。指定任务何时运行。
+  { prop:'schedule',label:'开始执行时间' , width: '180' },//任务的 Cron 表达式。指定任务何时运行。
   { prop:'lastsuccess',label:'上次成功时间' , width: '180' },//没成功不显示
   { prop:'lasterror',label:'上次失败时间' , width: '180' },//没失败不显示
-  { prop:'status',label:'状态' , width: '160' },
-  { prop:'enabled',label:'是否禁用' , width: '160' },
+  { prop:'timeone',label:'响应时间' , width: '200' },//将评估 cron 表达式的时区。
 ]
 // dashcolumn
 export const dashcolumn = [
@@ -64,40 +62,5 @@ export const listdata = [
   }
 ]
 export const tableData =[
-  {
-    id: 'job1',
-    display: '123',
-    timeone: 'europe/berlin12',
-    schedule:'20s',
-    success:'1448',
-    error:'0',
-    lastsuccess:'',
-    lasterror:'12',
-    status:'success',
-    enabled:''
-  },
-  {
-    id: 'job2',
-    display: '',
-    timeone: 'europe/berlin',
-    schedule:'20s',
-    success:'1448',
-    error:'0',
-    lastsuccess:'',
-    lasterror:'12',
-    status:'success',
-    enabled:''
-  },
-  {
-    id: 'job3',
-    display: '',
-    timeone: 'europe/berlin',
-    schedule:'20s',
-    success:'1448',
-    error:'0',
-    lastsuccess:'',
-    lasterror:'12',
-    status:'failed',
-    enabled:''
-  },
+
 ]

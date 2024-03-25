@@ -1,130 +1,145 @@
 <template>
   <div class="form">
-    <div class="top">
-      <el-button type="primary">新增</el-button>
-    </div>
-    <el-table
-    style="width: 100%"
-    ref="multipleTable"
-    :data="tableData"
-    tooltip-effect="dark"
-    :default-sort="{ prop: 'id', order: 'descending' }"
-  >
-    <el-table-column
-      v-for="(item, index) in columns"
-      :key="index"
-      :prop="item.prop"
-      :label="item.label"
-      :width="item.width"
-      :fixed="item.props === 'id'"
-    />
-    <el-table-column label="" min-width="160" fixed="right">
-      <template slot-scope="scope">
-        <span @click="handleEdit(scope.$index, scope.row)" class="edit">
-          <i class="el-icon-edit" />
-          <span style="margin-left: 6px">编辑</span>
-        </span>
-        <span @click="handleEdit(scope.$index, scope.row)" class="edit">
-          <i class="el-icon-delete" />
-          <span style="margin-left: 6px">删除</span>
-        </span>
-      </template>
-    </el-table-column>
-  </el-table>
-  <el-pagination
-  :page-size="20"
-  :pager-count="11"
-  layout="prev, pager, next"
-  :total="1000">
-</el-pagination>
+    <el-form
+      :model="ruleForm"
+      :rules="rules"
+      ref="ruleForm"
+      label-width="200px"
+      class="demo-ruleForm"
+    >
+      <el-form-item label="id" prop="id">
+        <el-input :disabled="flag"  placeholder="id" v-model="ruleForm.id" />
+      </el-form-item>
+      <el-form-item label="name" prop="name">
+        <el-input :disabled="flag" placeholder="name" v-model="ruleForm.name" />
+      </el-form-item>
+      <el-form-item label="bw" prop="bw">
+        <el-input placeholder="bw" v-model="ruleForm.bw" />
+      </el-form-item>
+      <el-form-item label="max_battery_capacity" prop="max_battery_capacity">
+        <el-input
+          placeholder="max_battery_capacity"
+          v-model="ruleForm.max_battery_capacity"
+        />
+      </el-form-item>
+      <el-form-item label="battery_sensing_rate" prop="battery_sensing_rate">
+        <el-input
+          placeholder="battery_sensing_rate"
+          v-model="ruleForm.battery_sensing_rate"
+        />
+      </el-form-item>
+      <el-form-item label="battery_sending_rate" prop="battery_sending_rate">
+        <el-input
+          placeholder="battery_sending_rate"
+          v-model="ruleForm.battery_sending_rate"
+        />
+      </el-form-item>
+      <el-form-item label="ioTClassName" prop="ioTClassName">
+        <el-input
+          placeholder="ioTClassName"
+          v-model="ruleForm.ioTClassName"
+        />
+      </el-form-item>
+      <el-form-item label="communicationProtocol" prop="communicationProtocol">
+        <el-input
+          placeholder="communicationProtocol"
+          v-model="ruleForm.communicationProtocol"
+        />
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="submitForm('ruleForm')">
+          保存
+        </el-button>
+      </el-form-item>
+    </el-form>
   </div>
-  
 </template>
-
+  
 <script>
+import {toString, tojson } from '../../../util/filter.js'
+
 export default {
   components: {},
   data() {
     return {
-      columns: [
-        { prop: "id", label: "id", width: "80" ,},
-        { prop: "name", label: "名称", width: "80" },
-        { prop: "bw", label: "bw", width: "80" },
-        {
-          prop: "max_battery_capacity",
-          label: "max_battery_capacity",
-          width: "180",
-        },
-        {
-          prop: "battery_sensing_rate",
-          label: "battery_sensing_rate",
-          width: "180",
-        },
-        {
-          prop: "battery_sending_rate",
-          label: "battery_sending_rate",
-          width: "180",
-        },
-        { prop: "ioTClassName", label: "ioTClassName", width: "180" },
-        { prop: "mobilityEntity", label: "mobilityEntity", width: "180" },
-        {
-          prop: "communicationProtocol",
-          label: "communicationProtocol",
-          width: "200",
-        },
-      ],
-      tableData: [
-        {
-          id: "1",
-          name: "222",
-          bw: "222",
-          max_battery_capacity: "2222",
-          battery_sensing_rate: "2222",
-          battery_sending_rate: "2222",
-          ioTClassName: "444",
-          mobilityEntity: "444",
-          communicationProtocol: "444",
-        },
-      ],
-      IoT_ruleForm: {
-        id: "",
-        name: "",
-        bw: "",
-        max_battery_capacity: "",
-        battery_sensing_rate: "",
-        battery_sending_rate: "",
-        ioTClassName: "",
-        mobilityEntity: "",
-        communicationProtocol: "",
+      ruleForm: {
+            id: "",
+            name: "",
+            bw: "",
+            max_battery_capacity: "",
+            battery_sensing_rate: "",
+            battery_sending_rate: "",
+            ioTClassName: "",
+            mobilityEntity: "",
+            communicationProtocol: "",
       },
+      rules: {
+        id: [
+          { required: true, message: '请输入', trigger: 'blur' },
+          { min: 1, max: 10, message: '长度在 1 到 100 个字符', trigger: 'blur' }
+        ],
+        name: [
+          { required: true, message: '请输入', trigger: 'blur' },
+          { min: 1, max: 100, message: '长度在 1 到 100 个字符', trigger: 'blur' }
+        ],
+      },
+      flag:false
     };
   },
 
   computed: {},
 
-  mounted() {},
+  mounted() {
+    this.initdata = tojson(localStorage.getItem("lotdata"))
+    const query = this.$route.query
+    if(!query.status) return
+    const {  status } = query
+    this.ruleForm = status
+    this.flag = status || false
+    
+  },
 
   methods: {
-    handleEdit(){}
+    submitForm(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+            // 如果是编辑 flag为true
+            if(this.flag){
+               const data = this.initdata.map(item=>{
+                    if(item.id === this.ruleForm.id) {
+                        return this.ruleForm
+                    }
+                    return item
+               })
+               localStorage.setItem("lotdata", toString(data));
+            }else {
+                this.initdata.push(this.ruleForm);
+                localStorage.setItem("lotdata", toString(this.initdata));
+            }
+            this.$message.success("success!!");
+            this.$router.push({
+                path: "/home/iotnode"
+            });
+        } else {
+          console.log("error save!!");
+          return false;
+        }
+      });
+    },
   },
 };
 </script>
-<style lang='scss' scoped>
+  <style lang='scss' scoped>
 .form {
+  width: 40%;
   padding: 16px;
-  display: flex;
-    flex-direction: column;
-  .top {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 20px;
-  }
-  .edit {
-    cursor: pointer;
-    color: #1976d2;
-    margin-right: 10px;
-  }
+  margin-left: 60px;
+}
+
+.el-button {
+    width: 100%;
+    margin-top: 40px;
 }
 </style>
-
-   
+  
+     

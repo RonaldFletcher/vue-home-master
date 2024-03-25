@@ -28,24 +28,40 @@ export const constantRoutes = [
       {
         path: 'iotnode', 
         name: 'iotnode',
+        component: () => import('@/views/student/component/Iot'),
+      },
+      {
+        path: 'createIotnode', 
+        name: 'iotnode',
         component: () => import('@/views/student/component/creatlot'),
       },
       {
         path: 'fognode', 
         name: 'fognode',
+        component: () => import('@/views/student/component/Fog'),
+      },
+      {
+        path: 'createFognode', 
+        name: 'iotnode',
         component: () => import('@/views/student/component/creatFog'),
       },
       { 
         path: 'create', 
         name: 'create',
-        component: () => import('@/views/student/component/create'),
+        component: () => import('@/views/student/component/createJob'),
       }
     ]
   },
   {
     path:'/login',
     component: () => import('@/views/student/login'),
-  }
+  },
+  {
+    path:'/',
+    redirect:'/login'
+    // component: () => import('@/views/student/login'),
+  },
+
 ];
 
 const createRouter = () => new Router({

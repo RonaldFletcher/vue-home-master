@@ -26,3 +26,11 @@ export const formatDate = (str) => {
         return parseInt(time / 31536000000) + '年前'
     }
 }
+
+export const toString=(data)=> {
+    return JSON.stringify(data)
+}
+
+export const tojson=(data)=> {
+    return JSON.parse(data)
+}

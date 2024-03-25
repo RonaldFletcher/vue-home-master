@@ -2,7 +2,8 @@
   <div class="left-side">
     <div class="list">
       <div
-      @click="clickMenu(item)"
+      :class="{'light': lightitem ===item}"
+       @click="clickMenu(item)"
        :index="item.catalogName"
         v-for="item in leftListData"
         :key="item">
@@ -30,12 +31,14 @@ export default {
   },
   data () {
     return {
+        lightitem:'Dashboard'
     };
   },
   
   methods: {
     clickMenu(index){
-      this.$router.push({ path: `/home/${obj[index]}` });
+        this.lightitem = index
+        this.$router.push({ path: `/home/${obj[index]}` });
     },
   }
 }
@@ -53,8 +56,12 @@ export default {
         flex-direction: column;
         div {
           padding: 12px 10px 12px 30px;
-          
+          cursor: pointer;
         }
+      }
+      .light {
+        color: #2596FD;
+        background: #fff;
       }
   }
  

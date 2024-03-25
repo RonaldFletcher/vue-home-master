@@ -14,33 +14,18 @@
           v-model="ruleForm.id"/>
       </el-form-item>
        <el-form-item
-        label="名称"
-        prop="name" >
+        label="别名"
+        prop="display" >
         <el-input
           :disabled="flag==='edit'"
-          v-model="ruleForm.name"/>
-      </el-form-item>
-      <el-form-item
-        label="别名"
-        prop="displayname">
-        <el-input v-model="ruleForm.displayname"/>
-      </el-form-item>
-      <el-form-item
-        label="时区"
-        prop="timeone">
-        <el-input v-model="ruleForm.timeone"/>
-      </el-form-item>
-      <el-form-item
-        label="作业开始时间"
-        prop="schedule">
-        <el-input v-model="ruleForm.schedule" placeholder="任务的 Cron 表达式。指定任务何时运行。"/>
+          v-model="ruleForm.display"/>
       </el-form-item>
        <el-form-item
         label="所有者"
         prop="" >
-        <el-input
-          :disabled="flag==='edit'" placeholder="任务所属物联网节点"
-          v-model="ruleForm.owner"/>
+          <el-select :disabled="flag==='edit'" v-model="ruleForm.owner" placeholder="任务所属物联网节点">
+            <el-option :label="item.name" :value="item.name" v-for="(item,index) in allnode" :key="index"></el-option>
+        </el-select>
       </el-form-item>
       <el-form-item label="带宽" prop="bw">
         <el-select v-model="ruleForm.bw" placeholder="请选择带宽需求">
@@ -78,6 +63,7 @@
 </template>
 
 <script>
+import { toString, tojson } from "../../../util/filter.js";
 export default {
   components: {},
   data () {
@@ -96,13 +82,10 @@ export default {
         id: [
           { required: true, message: '请输入', trigger: 'blur' },
           { min: 1, max: 10, message: '长度在 1 到 100 个字符', trigger: 'blur' }
-        ],
-        /*status: [
-          { required: true, message: '请输入', trigger: 'blur' },
-          { min: 1, max: 100, message: '长度在 1 到 100 个字符', trigger: 'blur' }
-        ],*/
+        ]
       },
-      flag:'add'
+      flag:'add',
+      allnode:[]
     };
   },
 
@@ -110,22 +93,42 @@ export default {
   computed: {},
 
   mounted(){
+    this.getallnode()
+    this.initdata = tojson(localStorage.getItem("jobdata"));
     const query = this.$route.query
-    if(!query.flag) return
-    const { flag, status } = query
-    this.flag = flag
+    if(!query.status) return
+    const { status } = query
     this.ruleForm = status
+    this.flag = status || false;
+
   },
 
   methods: {
+    getallnode(){
+        const lot = tojson(localStorage.getItem("lotdata")) || []
+        const fog = tojson(localStorage.getItem("fogdata")) || []
+        console.log(lot, fog)
+        this.allnode  = lot.concat(fog) 
+        console.log(this.allnode )
+    },
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
+            // 如果是编辑 flag为true
+            if(this.flag){
+               const data = this.initdata.map(item=>{
+                    if(item.id === this.ruleForm.id) {
+                        return this.ruleForm
+                    }
+                    return item
+               })
+               localStorage.setItem("jobdata", toString(data));
+            }else {
+                this.initdata.push(this.ruleForm);
+                localStorage.setItem("jobdata", toString(this.initdata));
+            }
           this.$message.success('success!!')
-          this.$router.push({ path: '/home/job', query: {
-            status: this.ruleForm,
-            flag: this.flag
-          } });
+          this.$router.push({ path: '/home/job' });
         } else {
           console.log('error save!!');
           return false;
@@ -140,6 +143,7 @@ export default {
 .form {
     width: 40%;
     padding: 16px;
+    margin-left: 60px;
 }
 </style>
 
